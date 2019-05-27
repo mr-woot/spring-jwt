@@ -4,10 +4,7 @@ import com.paisabazaar.kafka_admin.exception.AppException;
 import com.paisabazaar.kafka_admin.model.Role;
 import com.paisabazaar.kafka_admin.model.RoleName;
 import com.paisabazaar.kafka_admin.model.User;
-import com.paisabazaar.kafka_admin.payload.ApiResponse;
-import com.paisabazaar.kafka_admin.payload.JwtAuthenticationResponse;
-import com.paisabazaar.kafka_admin.payload.LoginRequest;
-import com.paisabazaar.kafka_admin.payload.RegisterRequest;
+import com.paisabazaar.kafka_admin.payload.*;
 import com.paisabazaar.kafka_admin.repository.RoleRepository;
 import com.paisabazaar.kafka_admin.repository.UserRepository;
 import com.paisabazaar.kafka_admin.security.JwtTokenProvider;
@@ -30,7 +27,7 @@ import java.net.URI;
 import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
 
@@ -50,7 +47,7 @@ public class AuthController {
         this.tokenProvider = tokenProvider;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -66,7 +63,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         if(userRepository.existsByUsername(registerRequest.getUsername())) {
             return new ResponseEntity<>(new ApiResponse(false, "Username is already taken!"),
