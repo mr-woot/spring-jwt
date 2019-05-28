@@ -1,6 +1,7 @@
 package com.paisabazaar.kafka_admin.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.paisabazaar.kafka_admin.model.CurrentStatus;
 import com.paisabazaar.kafka_admin.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,15 +25,18 @@ public class UserPrincipal implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private String currentStatus;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Long id, String name, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String name, String username, String email, String password, String currentStatus, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.currentStatus = currentStatus;
     }
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
@@ -45,8 +49,13 @@ public class UserPrincipal implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getCurrentStatus().getStatus(),
                 authorities
         );
+    }
+
+    public String getCurrentStatus() {
+        return currentStatus;
     }
 
     public Long getId() {

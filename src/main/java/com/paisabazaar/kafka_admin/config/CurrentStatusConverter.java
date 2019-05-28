@@ -7,7 +7,7 @@ import javax.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class CurentStatusConverter implements AttributeConverter<CurrentStatus, String> {
+public class CurrentStatusConverter implements AttributeConverter<CurrentStatus, String> {
 
     @Override
     public String convertToDatabaseColumn(CurrentStatus status) {
