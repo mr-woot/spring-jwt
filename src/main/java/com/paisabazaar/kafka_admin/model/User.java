@@ -49,6 +49,9 @@ public class User extends DateAudit {
     @Enumerated(EnumType.STRING)
     private CurrentStatus currentStatus = CurrentStatus.PENDING;
 
+    @Column(name = "is_email_verified", columnDefinition = "boolean default false")
+    private Boolean isEmailVerified;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -62,6 +65,21 @@ public class User extends DateAudit {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.getIsEmailVerified() == null) {
+            this.setIsEmailVerified(false);
+        }
+    }
+
+    public Boolean getIsEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setIsEmailVerified(Boolean isEmailVerified) {
+        this.isEmailVerified = isEmailVerified;
     }
 
     public CurrentStatus getCurrentStatus() {
@@ -118,5 +136,19 @@ public class User extends DateAudit {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", currentStatus=" + currentStatus +
+                ", isEmailVerified=" + isEmailVerified +
+                ", roles=" + roles +
+                '}';
     }
 }

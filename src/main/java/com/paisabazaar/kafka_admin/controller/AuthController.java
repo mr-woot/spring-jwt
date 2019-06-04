@@ -8,13 +8,18 @@ import com.paisabazaar.kafka_admin.payload.*;
 import com.paisabazaar.kafka_admin.repository.RoleRepository;
 import com.paisabazaar.kafka_admin.repository.UserRepository;
 import com.paisabazaar.kafka_admin.security.JwtTokenProvider;
+import com.paisabazaar.kafka_admin.security.UserPrincipal;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +44,8 @@ public class AuthController {
 
     private final JwtTokenProvider tokenProvider;
 
+    private static final Logger logger = LogManager.getLogger("AuthController");
+
     public AuthController(AuthenticationManager authenticationManager, @Qualifier("userRepository") UserRepository userRepository, @Qualifier("roleRepository") RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -49,16 +56,14 @@ public class AuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsernameOrEmail(),
                         loginRequest.getPassword()
                 )
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        // UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         String jwt = tokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }

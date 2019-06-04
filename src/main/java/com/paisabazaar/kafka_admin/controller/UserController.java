@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -38,7 +39,7 @@ public class UserController {
 
     @PostMapping("/user/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> updateUser(@CurrentUser UserPrincipal currentUser, @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<?> updateUser(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         Optional<User> existing = userRepository.findById(currentUser.getId());
         if (updateUserRequest.getPassword() != null) {
             updateUserRequest.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
@@ -72,6 +73,15 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        return new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
+        logger.info(user.getCurrentStatus().getStatus());
+
+        return new UserProfile(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getCreatedAt(),
+                user.getIsEmailVerified(),
+                user.getCurrentStatus().getStatus()
+        );
     }
 }

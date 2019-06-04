@@ -27,9 +27,11 @@ public class UserPrincipal implements UserDetails {
 
     private String currentStatus;
 
+    private Boolean isEmailVerified;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Long id, String name, String username, String email, String password, String currentStatus, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String name, String username, String email, String password, Boolean isEmailVerified, String currentStatus, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -37,6 +39,7 @@ public class UserPrincipal implements UserDetails {
         this.password = password;
         this.authorities = authorities;
         this.currentStatus = currentStatus;
+        this.isEmailVerified = isEmailVerified;
     }
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
@@ -49,9 +52,14 @@ public class UserPrincipal implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getIsEmailVerified(),
                 user.getCurrentStatus().getStatus(),
                 authorities
         );
+    }
+
+    public Boolean getIsEmailVerified() {
+        return isEmailVerified;
     }
 
     public String getCurrentStatus() {
@@ -102,7 +110,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isEmailVerified;
     }
 
     @Override
@@ -117,4 +125,6 @@ public class UserPrincipal implements UserDetails {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+
 }
